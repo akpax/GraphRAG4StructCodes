@@ -1,2 +1,6 @@
 
 requests
+python_dotenv
+lxml
+pytest
+pytest-unordered
