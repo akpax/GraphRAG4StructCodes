@@ -19,13 +19,13 @@ def process_soup(soup: bs4.BeautifulSoup) -> dict:
         if div.select_one("div.content-root"):
             chapter["items"].append(process_item_div(div))
         else:
-            res = process_header_div(div)
-            if res["type"] == "section":
-                chapter["sections"].append(res)
-            if res["type"] == "chapter":
-                chapter["chapter"] = res
+            item = process_header_div(div)
+            if item["type"] == "section":
+                chapter["sections"].append(item)
+            elif item["type"] == "chapter":
+                chapter["chapter"] = item
             else:
-                print(f"Item {res['id']} not identified as Chapter or Section")
+                print(f"Item {item['id']} not identified as Chapter or Section")
     return chapter
 
 
@@ -51,7 +51,7 @@ def process_header_div(div: bs4.element.Tag) -> dict:
             # Combine all pieces of text into one string and add to item dictionary
             item["content"] = " ".join(content)
             item["id"] = find_id(item["content"])
-            item["type"] = determine_section_or_chapter(item["content"])
+            item["type"] = determine_section_or_chapter(item["id"])
         else:
             # Handle cases where span_content_root is not a Tag object
             item["content"] = "Content not found or not a tag"
