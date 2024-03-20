@@ -92,7 +92,36 @@ def process_item_div(div: bs4.element.Tag) -> dict:
 
 def find_item_references(txt: str) -> list:
     matches = re.finditer(r"\d+(\.\d+)+", txt)
-    return list(set([match.group() for match in matches]))
+    refs = list(set([match.group() for match in matches]))
+    # filter so only refers with an existing chapter (1-27) are included
+    return clean_refs(refs)
+
+
+def clean_refs(refs: list) -> list:
+    refs = remove_refs_outside_chapter_range(refs)
+    refs = remove_refs_ending_in_0(refs)
+    return refs
+
+
+def remove_refs_outside_chapter_range(refs: list, start=1, end=27) -> list:
+    # remove refs to chapters that do not exist
+    existing_chapters = [str(num) for num in list(range(start, end + 1))]
+    cleaned_refs = []
+    for ref in refs:
+        # get chapter number
+        ch = ref[: ref.index(".")]
+        if ch in existing_chapters:
+            cleaned_refs.append(ref)
+    return cleaned_refs
+
+
+def remove_refs_ending_in_0(refs: list) -> list:
+    cleaned_refs = []
+    for ref in refs:
+        end = ref[ref.rindex(".") + 1 :]
+        if end not in ["0", "00"]:
+            cleaned_refs.append(ref)
+    return cleaned_refs
 
 
 def find_chapter_references(txt: str) -> list:

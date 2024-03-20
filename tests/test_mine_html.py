@@ -8,6 +8,7 @@ from ..mine_html import (
     find_id,
     get_chapter_from_path,
     determine_section_or_chapter,
+    remove_refs_ending_in_0,
 )
 
 
@@ -19,6 +20,10 @@ from ..mine_html import (
         ("this contains 1.2.32.3 2 references 9.23.12.1 ", ["1.2.32.3", "9.23.12.1"]),
         ("this contains O REFERENCES 1. ", []),
         ("check duplicates 1.2.3 1.2.3", ["1.2.3"]),
+        ("check case where chapter does not exist 0.2.3 this should be excluded", []),
+        ("another case where chapter does not exist 28.2.3 should be excluded", []),
+        ("exclusion case 1.2.3 should exclude 28.2.3 ", ["1.2.3"]),
+        ("testing zero exclusion 5.2.3.0 next ref 1.2.3 ", ["1.2.3"]),
     ],
 )
 def test_find_item_references(test_input, expected):
@@ -56,14 +61,9 @@ def test_find_chapter_references(test_input, expected):
         (" 12.3.2.4 check space in begining case", "12.3.2.4"),
     ],
 )
-def test_id(test_input, expected):
+def test_find_id(test_input, expected):
     out = find_id(test_input)
     assert out == expected
-
-
-def test_id_typical_case():
-    path = pathlib.Path("data/ACI318-19_html/ACI318-19_ch1.html")
-    assert get_chapter_from_path(path) == "ch1"
 
 
 @pytest.mark.parametrize(
@@ -77,3 +77,13 @@ def test_id_typical_case():
 )
 def test_determine_section_or_chapter(test_input, expected):
     assert determine_section_or_chapter(test_input) == expected
+
+
+def test_id_typical_case():
+    path = pathlib.Path("data/ACI318-19_html/ACI318-19_ch1.html")
+    assert get_chapter_from_path(path) == "ch1"
+
+
+def test_remove_refs_ending_in_0():
+    test = ["1.2.3.0", "2.3.2", "1.2.3.00"]
+    assert remove_refs_ending_in_0(test) == ["2.3.2"]
