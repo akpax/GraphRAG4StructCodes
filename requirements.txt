@@ -4,3 +4,6 @@ python_dotenv
 lxml
 pytest
 pytest-unordered
+langchain
+neo4j
+langchain_openai
