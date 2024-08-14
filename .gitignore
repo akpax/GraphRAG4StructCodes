@@ -7,3 +7,4 @@ scratch.py
 archive/
 data/code_json
 data/code_pdfs
+auto_scrape.py
